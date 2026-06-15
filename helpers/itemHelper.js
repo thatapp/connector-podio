@@ -22,7 +22,39 @@ function hasContent(v) {
     return true;
 }
 
-exports.fieldTransform = (item, update = false) => {
+// Which fields are category fields changes rarely, so cache the lookup per app
+// for the process lifetime. (Caches the SET of category field ids, not their
+// option values — so option changes don't make this stale.)
+const _categoryFieldCache = {};
+
+/**
+ * Set of identifiers (external_id AND field_id as a string) for every category
+ * field in the app. Used to gate the legacy "split a ';'-delimited string into
+ * multiple values" behavior so it ONLY applies to category (multi-select)
+ * fields. A text field containing "&nbsp;" (or any ';') must NOT be split —
+ * doing so produced Podio "Multiple is not allowed for field ..." errors.
+ * On any failure returns an empty Set (safer to not split than to over-split).
+ */
+exports.getCategoryFieldIds = async (podio, appId) => {
+    if (!appId) return new Set();
+    if (_categoryFieldCache[appId]) return _categoryFieldCache[appId];
+    try {
+        const app = await podio.get('/app/' + appId);
+        const set = new Set();
+        for (const f of (app.fields || [])) {
+            if (f.type === 'category') {
+                if (f.external_id) set.add(f.external_id);
+                if (f.field_id !== undefined && f.field_id !== null) set.add(String(f.field_id));
+            }
+        }
+        _categoryFieldCache[appId] = set;
+        return set;
+    } catch (e) {
+        return new Set();
+    }
+};
+
+exports.fieldTransform = (item, update = false, categoryFields = null) => {
     const data = {};
     for (const key in item) {
         if (item[key] === null || item[key] === undefined) {
@@ -42,7 +74,10 @@ exports.fieldTransform = (item, update = false) => {
         } else {
             var result = (item[key]).toString();
             if(!_.isEmpty(result)){
-                if (result.includes(";")) {
+                // ";" splits a value into MULTIPLE only for category fields.
+                // For every other field type a ";" (e.g. inside "&nbsp;" or
+                // ordinary text) is literal and must be left intact.
+                if (result.includes(";") && categoryFields && categoryFields.has(key)) {
                     data[key.toString()] = result.split(";")
                 } else {
                     data[key.toString()] = item[key];

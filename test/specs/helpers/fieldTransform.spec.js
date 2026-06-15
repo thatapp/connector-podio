@@ -34,7 +34,15 @@ describe('helpers/itemHelper.fieldTransform', function () {
         expect(fieldTransform({ due: d }).due).to.deep.equal(d);
     });
 
-    it('splits semicolon-delimited multi-values into an array', function () {
-        expect(fieldTransform({ tags: 'a;b;c' }).tags).to.deep.equal(['a', 'b', 'c']);
+    it('splits ;-delimited values into an array ONLY for category fields', function () {
+        // A non-category field (e.g. text with "&nbsp;") must NOT be split —
+        // splitting it caused Podio "Multiple is not allowed for field ..." errors.
+        expect(fieldTransform({ desc: 'Hi&nbsp;there; 3.05Euro' }).desc)
+            .to.equal('Hi&nbsp;there; 3.05Euro');
+        expect(fieldTransform({ tags: 'a;b;c' }, false, new Set(['other'])).tags)
+            .to.equal('a;b;c');
+        // A category field (present in the provided set) IS split into multiple.
+        expect(fieldTransform({ colors: 'a;b;c' }, false, new Set(['colors'])).colors)
+            .to.deep.equal(['a', 'b', 'c']);
     });
 });
