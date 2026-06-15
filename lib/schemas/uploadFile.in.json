@@ -4,7 +4,26 @@
       "url": {
         "type": "string",
         "required": true,
-        "title": "Url of the file"
+        "title": "Url of the file",
+        "description": "Publicly fetchable (or FileHaven) URL of the file to upload"
+      },
+      "filename": {
+        "type": "string",
+        "required": false,
+        "title": "Filename",
+        "description": "Name to give the file in Podio. Defaults to the URL basename. Include the extension so Podio detects the correct type."
+      },
+      "mimetype": {
+        "type": "string",
+        "required": false,
+        "title": "Mimetype",
+        "description": "Content type of the file (e.g. application/pdf). Used to set the file extension when the filename has none."
+      },
+      "description": {
+        "type": "string",
+        "required": false,
+        "title": "Description",
+        "description": "Optional description to set on the Podio file after upload."
       }
     }
   }
