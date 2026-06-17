@@ -54,6 +54,105 @@ exports.getCategoryFieldIds = async (podio, appId) => {
     }
 };
 
+// Image fields, like category fields, change rarely — cache the per-app list
+// for the process lifetime. Stores {field_id, external_id} for each image field
+// so the update path can match data keyed by either identifier.
+const _imageFieldCache = {};
+
+async function getImageFields(podio, appId) {
+    if (!appId) return [];
+    if (_imageFieldCache[appId]) return _imageFieldCache[appId];
+    try {
+        const app = await podio.get('/app/' + appId);
+        const list = (app.fields || [])
+            .filter(f => f.type === 'image')
+            .map(f => ({ field_id: f.field_id, external_id: f.external_id }));
+        _imageFieldCache[appId] = list;
+        return list;
+    } catch (e) {
+        return [];
+    }
+}
+exports.getImageFields = getImageFields;
+
+// Coerce a provided file_id to the shape Podio expects (numeric where possible,
+// matching how GET returns file_ids). Returns null for empty/blank values.
+function normalizeFileId(v) {
+    if (v === null || v === undefined) return null;
+    if (typeof v === 'object') {
+        // { value: id } or { file_id: id } wrappers
+        if ('file_id' in v) return normalizeFileId(v.file_id);
+        if ('value' in v) return normalizeFileId(v.value);
+        return null;
+    }
+    if (typeof v === 'string') {
+        const t = v.trim();
+        if (t === '') return null;
+        return /^\d+$/.test(t) ? Number(t) : t;
+    }
+    return v;
+}
+
+// Pull the current file_ids off an item's image field. GET /item/{id} returns
+// image values as [{ value: { file_id, ... } }, ...].
+function getExistingImageFileIds(podioItem, field) {
+    const f = (podioItem.fields || []).find(ff =>
+        String(ff.field_id) === String(field.field_id) ||
+        (field.external_id && ff.external_id === field.external_id));
+    if (!f || !Array.isArray(f.values)) return [];
+    return f.values
+        .map(v => (v && v.value && typeof v.value === 'object') ? v.value.file_id : (v && v.value))
+        .map(normalizeFileId)
+        .filter(id => id !== null);
+}
+
+/**
+ * Intelligent image-field handling for item updates.
+ *
+ * Podio's PUT /item replaces an image field's entire file list, so sending a
+ * single new file_id would silently drop the images already on the item. This
+ * makes the behavior dependent on the caller's intent:
+ *   - A SINGLE file_id (string/number/{value}) APPENDS to the existing images.
+ *   - An ARRAY of file_ids REPLACES the field with exactly those images
+ *     (an empty array clears the field — Podio's native behavior).
+ *
+ * Mutates and returns `data`. On any failure to read the current item it falls
+ * back to the value as supplied (the old replace behavior) rather than throwing.
+ */
+exports.mergeImageFieldValues = async (podio, appId, item_id, data) => {
+    const imageFields = await getImageFields(podio, appId);
+    if (!imageFields.length) return data;
+
+    // Image fields present in the payload with a single (non-array) value want
+    // append semantics; arrays are left untouched (replace).
+    const appendTargets = [];
+    for (const field of imageFields) {
+        for (const key of [field.external_id, String(field.field_id)]) {
+            if (key && Object.prototype.hasOwnProperty.call(data, key) && !Array.isArray(data[key])) {
+                appendTargets.push({ key, field });
+            }
+        }
+    }
+    if (!appendTargets.length) return data;
+
+    let podioItem;
+    try {
+        podioItem = await podio.get(`/item/${item_id}`);
+    } catch (e) {
+        return data; // can't read existing images — leave caller's value as-is
+    }
+
+    for (const { key, field } of appendTargets) {
+        const merged = getExistingImageFileIds(podioItem, field);
+        const providedId = normalizeFileId(data[key]);
+        if (providedId !== null && !merged.some(id => String(id) === String(providedId))) {
+            merged.push(providedId);
+        }
+        data[key] = merged;
+    }
+    return data;
+};
+
 exports.fieldTransform = (item, update = false, categoryFields = null) => {
     const data = {};
     for (const key in item) {
