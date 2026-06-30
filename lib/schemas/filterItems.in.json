@@ -15,6 +15,14 @@
     },
     "sort_desc": {
       "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "enumTitles": [
+        "True",
+        "False"
+      ],
       "title": "Sort Descending",
       "required": false,
       "description": "True to sort in descending order (newest first)"

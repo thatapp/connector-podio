@@ -18,6 +18,14 @@
     },
     "sort_desc": {
       "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "enumTitles": [
+        "True",
+        "False"
+      ],
       "title": "Sort Descending",
       "required": false
     },

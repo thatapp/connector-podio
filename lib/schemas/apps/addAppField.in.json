@@ -26,6 +26,14 @@
     },
     "required": {
       "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "enumTitles": [
+        "True",
+        "False"
+      ],
       "title": "Required",
       "description": "Whether this field must be filled when creating/editing items"
     },

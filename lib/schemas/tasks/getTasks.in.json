@@ -3,6 +3,14 @@
   "properties": {
     "completed": {
       "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "enumTitles": [
+        "True",
+        "False"
+      ],
       "title": "Completed",
       "description": "True to return only completed tasks, false for open tasks"
     },
@@ -63,6 +71,14 @@
     },
     "sort_desc": {
       "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "enumTitles": [
+        "True",
+        "False"
+      ],
       "title": "Sort Descending",
       "description": "Sort in descending order"
     },

@@ -22,32 +22,40 @@ function hasContent(v) {
     return true;
 }
 
-// Which fields are category fields changes rarely, so cache the lookup per app
-// for the process lifetime. (Caches the SET of category field ids, not their
-// option values — so option changes don't make this stale.)
-const _categoryFieldCache = {};
+// Which fields are splittable changes rarely, so cache the lookup per app for
+// the process lifetime. (Caches the SET of field ids, not their option/value
+// contents — so option changes don't make this stale.)
+const _splittableFieldCache = {};
 
 /**
- * Set of identifiers (external_id AND field_id as a string) for every category
- * field in the app. Used to gate the legacy "split a ';'-delimited string into
- * multiple values" behavior so it ONLY applies to category (multi-select)
- * fields. A text field containing "&nbsp;" (or any ';') must NOT be split —
- * doing so produced Podio "Multiple is not allowed for field ..." errors.
+ * Set of identifiers (external_id AND field_id as a string) for every field in
+ * the app whose ';'-delimited string value should be split into MULTIPLE values.
+ * That is the multi-value field types:
+ *   - category  — multi-select option ids/labels
+ *   - app       — relationship/reference fields holding multiple item_ids
+ *                 (e.g. "123;456"); item ids never contain ';', so single
+ *                 references like "123" are unaffected.
+ *
+ * This gates the legacy "split a ';'-delimited string into multiple values"
+ * behavior so it does NOT apply to text-like fields. A text field containing
+ * "&nbsp;" (or any ';') must NOT be split — doing so produced Podio "Multiple
+ * is not allowed for field ..." errors.
+ *
  * On any failure returns an empty Set (safer to not split than to over-split).
  */
-exports.getCategoryFieldIds = async (podio, appId) => {
+exports.getSplittableFieldIds = async (podio, appId) => {
     if (!appId) return new Set();
-    if (_categoryFieldCache[appId]) return _categoryFieldCache[appId];
+    if (_splittableFieldCache[appId]) return _splittableFieldCache[appId];
     try {
         const app = await podio.get('/app/' + appId);
         const set = new Set();
         for (const f of (app.fields || [])) {
-            if (f.type === 'category') {
+            if (f.type === 'category' || f.type === 'app') {
                 if (f.external_id) set.add(f.external_id);
                 if (f.field_id !== undefined && f.field_id !== null) set.add(String(f.field_id));
             }
         }
-        _categoryFieldCache[appId] = set;
+        _splittableFieldCache[appId] = set;
         return set;
     } catch (e) {
         return new Set();
@@ -153,7 +161,7 @@ exports.mergeImageFieldValues = async (podio, appId, item_id, data) => {
     return data;
 };
 
-exports.fieldTransform = (item, update = false, categoryFields = null) => {
+exports.fieldTransform = (item, update = false, splittableFields = null) => {
     const data = {};
     for (const key in item) {
         if (item[key] === null || item[key] === undefined) {
@@ -173,10 +181,11 @@ exports.fieldTransform = (item, update = false, categoryFields = null) => {
         } else {
             var result = (item[key]).toString();
             if(!_.isEmpty(result)){
-                // ";" splits a value into MULTIPLE only for category fields.
-                // For every other field type a ";" (e.g. inside "&nbsp;" or
-                // ordinary text) is literal and must be left intact.
-                if (result.includes(";") && categoryFields && categoryFields.has(key)) {
+                // ";" splits a value into MULTIPLE only for multi-value fields
+                // (category options and app/relationship references). For every
+                // other field type a ";" (e.g. inside "&nbsp;" or ordinary text)
+                // is literal and must be left intact.
+                if (result.includes(";") && splittableFields && splittableFields.has(key)) {
                     data[key.toString()] = result.split(";")
                 } else {
                     data[key.toString()] = item[key];
@@ -244,17 +253,32 @@ exports.normalizeFieldValue = (value) => {
     return value;
 };
 
-exports.emitData = async (cfg,result,that,end = null) => {
-    const {messages} = require('elasticio-node');
+// A message body must be an object for the platform to expose named, mappable
+// fields downstream. Wrap primitives so an array of scalars still emits cleanly.
+function toMessageBody(v) {
+    return (v !== null && typeof v === 'object' && !Array.isArray(v)) ? v : { value: v };
+}
 
-    if (cfg.splitResult && Array.isArray(result)) {
+// Emit results to the next flow step.
+//
+// An ARRAY is ALWAYS split into one message PER element — a raw array body
+// exposes no named fields to the next step's mapper, so list endpoints
+// (findReferenceable, filter, get-by-app, tags, etc.) appeared to "drop" their
+// output downstream. Splitting makes each item's fields individually mappable.
+// A single object emits as one message. (`splitResult` is accepted for
+// backward-compatible call signatures but no longer gates splitting — arrays
+// always split.) Callers should `await` this so every emit flushes before the
+// action's process promise resolves.
+exports.emitData = async (cfg, result, that, end = null) => {
+    const { messages } = require('elasticio-node');
+
+    if (Array.isArray(result)) {
         for (const i_item of result) {
-            const output = messages.newMessageWithBody(i_item);
-            await that.emit('data', output);
+            await that.emit('data', messages.newMessageWithBody(toMessageBody(i_item)));
         }
-    } else {
-        that.emit('data', messages.newMessageWithBody(result));
+        return;
     }
+    await that.emit('data', messages.newMessageWithBody(toMessageBody(result)));
 };
 
 /**

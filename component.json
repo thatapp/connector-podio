@@ -512,9 +512,7 @@
       "main": "./lib/actions/items/findReferencesItems.js",
       "title": "Item: Find Referenceable",
       "description": "Search for items that can be referenced by a field",
-      "metadata": {
-        "in": "./lib/schemas/findReferencesItems.in.json"
-      }
+      "dynamicMetadata": true
     },
     "getItem": {
       "main": "./lib/actions/items/getItem.js",
@@ -608,9 +606,9 @@
       "fields": {
         "appId": {
           "viewClass": "TextFieldView",
-          "prompt": "Enter app_id",
+          "prompt": "Enter app_id (optional — leave blank to pass app_id dynamically on the incoming message)",
           "label": "Podio Application",
-          "required": true
+          "required": false
         },
         "hook": {
           "label": "Execute Hooks",

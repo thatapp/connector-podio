@@ -45,16 +45,40 @@
     },
     "allow_edit": {
       "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "enumTitles": [
+        "True",
+        "False"
+      ],
       "title": "Allow Edit",
       "description": "Allow members to edit items"
     },
     "allow_attachments": {
       "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "enumTitles": [
+        "True",
+        "False"
+      ],
       "title": "Allow Attachments",
       "description": "Allow file attachments on items"
     },
     "allow_comments": {
       "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "enumTitles": [
+        "True",
+        "False"
+      ],
       "title": "Allow Comments",
       "description": "Allow comments on items"
     },

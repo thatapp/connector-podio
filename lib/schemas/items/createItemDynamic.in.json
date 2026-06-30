@@ -25,11 +25,27 @@
     },
     "hook": {
       "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "enumTitles": [
+        "True",
+        "False"
+      ],
       "title": "Execute Hooks",
       "description": "Whether to execute hooks for this item creation (default: true)"
     },
     "silent": {
       "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "enumTitles": [
+        "True",
+        "False"
+      ],
       "title": "Silent Mode",
       "description": "If true, suppresses notifications and activity stream updates (default: false)"
     }

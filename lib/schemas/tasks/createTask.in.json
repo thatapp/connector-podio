@@ -39,6 +39,14 @@
     },
     "private": {
       "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "enumTitles": [
+        "True",
+        "False"
+      ],
       "title": "Private",
       "description": "True to make the task private"
     },

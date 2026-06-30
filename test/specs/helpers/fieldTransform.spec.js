@@ -34,15 +34,26 @@ describe('helpers/itemHelper.fieldTransform', function () {
         expect(fieldTransform({ due: d }).due).to.deep.equal(d);
     });
 
-    it('splits ;-delimited values into an array ONLY for category fields', function () {
-        // A non-category field (e.g. text with "&nbsp;") must NOT be split —
+    it('splits ;-delimited values into an array ONLY for splittable fields', function () {
+        // A text-like field (e.g. text with "&nbsp;") must NOT be split —
         // splitting it caused Podio "Multiple is not allowed for field ..." errors.
         expect(fieldTransform({ desc: 'Hi&nbsp;there; 3.05Euro' }).desc)
             .to.equal('Hi&nbsp;there; 3.05Euro');
         expect(fieldTransform({ tags: 'a;b;c' }, false, new Set(['other'])).tags)
             .to.equal('a;b;c');
-        // A category field (present in the provided set) IS split into multiple.
+        // A splittable field (present in the provided set) IS split into multiple.
         expect(fieldTransform({ colors: 'a;b;c' }, false, new Set(['colors'])).colors)
             .to.deep.equal(['a', 'b', 'c']);
+    });
+
+    it('splits ;-delimited references for relationship (app) fields (regression: multi-references dropped)', function () {
+        // Relationship fields are type "app"; getSplittableFieldIds includes them
+        // so multiple item references passed as "123;456" become an array Podio
+        // accepts. Before this, they were sent as a literal string and dropped.
+        expect(fieldTransform({ related: '123;456' }, true, new Set(['related'])).related)
+            .to.deep.equal(['123', '456']);
+        // A single reference (no ";") is left intact whether or not it's splittable.
+        expect(fieldTransform({ related: '123' }, true, new Set(['related'])).related)
+            .to.equal('123');
     });
 });

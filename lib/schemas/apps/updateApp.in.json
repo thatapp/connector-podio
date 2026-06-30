@@ -1,17 +1,23 @@
 {
-    "type": "object",
-    "properties": {
-      "app_id": {
-        "type": "number",
-        "required": true,
-        "title": "App Id"
-      },
-      "silent": {
-        "type": "boolean",
-        "required": false,
-        "title": "Silent"
-      }
+  "type": "object",
+  "properties": {
+    "app_id": {
+      "type": "number",
+      "required": true,
+      "title": "App Id"
+    },
+    "silent": {
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "enumTitles": [
+        "True",
+        "False"
+      ],
+      "required": false,
+      "title": "Silent"
     }
   }
-  
-  
+}

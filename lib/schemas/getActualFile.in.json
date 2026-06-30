@@ -8,6 +8,14 @@
     },
     "raw_data": {
       "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "enumTitles": [
+        "True",
+        "False"
+      ],
       "required": false,
       "title": "Raw Data"
     }

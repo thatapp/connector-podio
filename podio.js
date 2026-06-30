@@ -22,9 +22,16 @@ function Podio(cfg, context) {
     this.context = context;
 }
 
+// A single request may legitimately refresh once (token expired mid-flight).
+// More than this means the freshly-refreshed token is STILL being rejected —
+// keep going and the 401 -> refresh -> 401 cycle never settles, so the action
+// "spins" forever with no error. Cap it and surface a clear failure instead.
+var MAX_REFRESH_ATTEMPTS = 2;
+
 Podio.prototype.request = function (method, path, params, formData, headers) {
     var defered = Q.defer();
     var that = this;
+    var refreshAttempts = 0;
     if (!headers) {
         headers = {
             Authorization: 'OAuth2 ' + this.cfg.oauth.access_token
@@ -74,6 +81,21 @@ Podio.prototype.request = function (method, path, params, formData, headers) {
         } catch (e) { /* noop */ }
 
         if (401 === response.statusCode) {
+            // Bail out of an unbounded 401 -> refresh -> 401 loop. Without this
+            // cap a token that refreshes successfully but is still rejected by
+            // Podio spins forever and never rejects the deferred.
+            if (refreshAttempts >= MAX_REFRESH_ATTEMPTS) {
+                var loopErr = new Error(
+                    'Podio kept returning 401 (unauthorized) after refreshing the access token ' +
+                    refreshAttempts + ' time(s). Aborting to avoid an endless refresh loop — the ' +
+                    'token may lack access to this resource, or the credential needs to be reconnected.'
+                );
+                loopErr.statusCode = 401;
+                loopErr.kind = 'UNAUTHORIZED';
+                return defered.reject(loopErr);
+            }
+            refreshAttempts++;
+
             // Concurrent-refresh guard. If another action is already refreshing,
             // wait for the in-flight refresh to complete; then update OUR cfg
             // and retry the original request with the fresh access_token.
@@ -99,9 +121,17 @@ Podio.prototype.request = function (method, path, params, formData, headers) {
                 oauthUtils.refreshAppToken('podio', that.cfg, function (newCfgOrErr) {
                     if (newCfgOrErr instanceof Error) {
                         podioRefreshLock = null;
-                        newCfgOrErr.retry = true;            // transient — let platform retry
-                        rejectLock(newCfgOrErr);
-                        return defered.reject(newCfgOrErr);
+                        // A failed refresh is usually a transient blip (network /
+                        // 5xx on the token endpoint) and is safe to retry. But
+                        // invalid_grant / oauth.grant.expired means Podio has
+                        // permanently invalidated the refresh_token — it rotates on
+                        // every use and expires after prolonged inactivity. Retrying
+                        // re-sends the same dead token and burns all 10 backoff
+                        // attempts, surfacing a confusing raw 400 body. Classify it
+                        // as a clear, NON-retryable "reconnect the account" error.
+                        const refreshErr = classifyRefreshError(newCfgOrErr);
+                        rejectLock(refreshErr);
+                        return defered.reject(refreshErr);
                     }
                     // Happy path: existing logic assigns cfg, PATCHes the
                     // credential store, re-runs THIS request via onTokenRefresh.
@@ -252,6 +282,39 @@ Podio.prototype.attachFile = function (fileId, refType, refId) {
     };
     return this.post('/file/' + fileId + '/attach', params);
 };
+
+// Distinguish a permanently-expired Podio OAuth grant (re-auth required) from a
+// transient refresh failure (retryable). The error from helpers/http-utils.js
+// carries the raw token-endpoint body on `.responseBody`.
+function classifyRefreshError(err) {
+    var body = err && err.responseBody;
+    if (typeof body === 'string') {
+        try { body = JSON.parse(body); } catch (e) { body = null; }
+    }
+    var expiredGrant = body && (body.error === 'invalid_grant' ||
+        body.error_detail === 'oauth.grant.expired');
+
+    if (expiredGrant) {
+        var reauth = new Error(
+            'Podio authorization has expired and could not be refreshed. ' +
+            'Please reconnect your Podio account (re-run the OAuth authorization) ' +
+            'for this credential, then retry. Podio refresh tokens are valid for ' +
+            '28 days and rotate on every refresh (each refresh issues a new token ' +
+            'and invalidates the old one), so a credential that goes 28 days ' +
+            'without a refresh — or whose rotated token was not persisted — ' +
+            'requires a fresh authorization.'
+        );
+        reauth.statusCode = 401;
+        reauth.podioError = 'invalid_grant';
+        reauth.kind = 'UNAUTHORIZED';
+        reauth.retry = false;   // permanent — retrying re-sends the dead token
+        return reauth;
+    }
+
+    // Network error / 5xx on the token endpoint — plausibly transient.
+    err.retry = true;
+    return err;
+}
 
 function getValueFromEnv(key) {
     var compiled = handlebars.compile(key);

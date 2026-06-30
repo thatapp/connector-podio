@@ -1,39 +1,63 @@
 {
-    "type": "object",
-    "properties": {
-      "app_id": {
-        "type": "number",
-        "required": true,
-        "title": "app_id"
-      },
-      "query": {
-        "type": "string",
-        "required": true,
-        "title": "the text to search for"
-      },
-      "search_fields": {
-        "type": "string",
-        "required": false,
-        "title": "The list of fields to search in. Can f.ex. be used to limit the search to the title field."
-      },
-      "ref_type": {
-        "type": "string",
-        "required": false,
-        "title": "Reference Type",
-        "enum": ["item", "task", "status", "app"],
-        "enumTitles": ["Item", "Task", "Status", "App"]
-      },
-      "counts": {
-        "type": "boolean",
-        "required": false,
-        "title": "counts"
-      },
-      "highlights": {
-        "type": "boolean",
-        "required": false,
-        "title": "highlights"
-      }
+  "type": "object",
+  "properties": {
+    "app_id": {
+      "type": "number",
+      "required": true,
+      "title": "app_id"
+    },
+    "query": {
+      "type": "string",
+      "required": true,
+      "title": "the text to search for"
+    },
+    "search_fields": {
+      "type": "string",
+      "required": false,
+      "title": "The list of fields to search in. Can f.ex. be used to limit the search to the title field."
+    },
+    "ref_type": {
+      "type": "string",
+      "required": false,
+      "title": "Reference Type",
+      "enum": [
+        "item",
+        "task",
+        "status",
+        "app"
+      ],
+      "enumTitles": [
+        "Item",
+        "Task",
+        "Status",
+        "App"
+      ]
+    },
+    "counts": {
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "enumTitles": [
+        "True",
+        "False"
+      ],
+      "required": false,
+      "title": "counts"
+    },
+    "highlights": {
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "enumTitles": [
+        "True",
+        "False"
+      ],
+      "required": false,
+      "title": "highlights"
     }
   }
-  
-  
+}
