@@ -5,7 +5,21 @@
       "WebFetch(domain:docs.thatapp.io)",
       "WebFetch(domain:developers.podio.com)",
       "WebFetch(domain:podio.github.io)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.thatapp.io)",
+      "Bash(sed 's/<[^>]*>//g' /tmp/d_component-build-configuration.html | grep -iE \"Dockerfile|generateDockerfile|elastic.io.comp|alpine|size|byte|65536|64\" | head -40)",
+      "Bash(aws --version)",
+      "Bash(aws sts *)",
+      "Bash(aws s3 *)",
+      "Bash(cd \"C:/Users/SethHelgeson/Documents/GitHub/thatapp-ai-powered\")",
+      "Bash(rm -f _meta_test.js)",
+      "Bash(cd \"c:/Users/SethHelgeson/Documents/GitHub/podio-new-component\" && echo \"=== actions using helper.emitData \\(central path\\) ===\" && grep -rln \"emitData\" lib/actions | sed 's#lib/actions/##' && echo \"\" && echo \"=== actions emitting via newMessageWithBody directly \\(count\\) ===\" && grep -rln \"newMessageWithBody\" lib/actions | wc -l && echo \"\" && echo \"=== emitData definition \\(current\\) ===\" && grep -n -A14 \"exports.emitData\" helpers/itemHelper.js)"
+    ],
+    "additionalDirectories": [
+      "\\tmp",
+      "C:\\Users\\SethHelgeson\\Documents\\GitHub\\Sync\\lib\\helpers",
+      "C:\\Users\\SethHelgeson\\Documents\\GitHub\\Sync",
+      "C:\\Users\\SethHelgeson\\Documents\\GitHub\\thatapp-ai-powered"
     ]
   }
 }
