@@ -40,7 +40,6 @@
   },
   "devDependencies": {
     "chai": "4.2.0",
-    "code-quality-js": "git+https://github.com/thatapp/code-quality-js.git#master",
     "dotenv": "8.0.0",
     "eslint": "5.16.0",
     "eslint-config-airbnb-base": "13.1.0",
