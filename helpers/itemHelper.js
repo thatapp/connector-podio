@@ -303,6 +303,13 @@ exports.getFieldProperties = (field) => {
         const getStrConf = getConf.bind(null, 'string');
         const getNumConf = getConf.bind(null, 'number');
 
+        // Same as getStrConf, plus a format hint shown in the mapper.
+        function getDateConf(title, description) {
+            const conf = getStrConf(title);
+            conf.description = description;
+            return conf;
+        }
+
         switch (field.type.toLowerCase()) {
             case 'number':
             case 'member':
@@ -331,31 +338,36 @@ exports.getFieldProperties = (field) => {
                 break;
             case 'date':
                 props.type = 'object';
+                // Podio's date value carries every key below. `start`/`end` are
+                // the canonical write format (full datetime); the date/time pairs
+                // are the documented sub-fields; the *_utc keys are what Podio
+                // RETURNS on reads. All are exposed so a date mapped straight
+                // through from an upstream Podio step finds its matching target.
                 props.properties = {
-                    start_date: {
-                        type: 'string',
-                        required: false,
-                        title: field.label + ' (Start Date)',
-                        description: 'Date in YYYY-MM-DD format (e.g., 2024-03-15)'
-                    },
-                    start_time: {
-                        type: 'string',
-                        required: false,
-                        title: field.label + ' (Start Time)',
-                        description: 'Time in HH:MM format (e.g., 14:30). Only use if field includes time.'
-                    },
-                    end_date: {
-                        type: 'string',
-                        required: false,
-                        title: field.label + ' (End Date)',
-                        description: 'Date in YYYY-MM-DD format (e.g., 2024-03-16). Only use for date ranges.'
-                    },
-                    end_time: {
-                        type: 'string',
-                        required: false,
-                        title: field.label + ' (End Time)',
-                        description: 'Time in HH:MM format (e.g., 17:00). Only use for date ranges with time.'
-                    }
+                    start: getDateConf('(Start)',
+                        'Full start datetime, YYYY-MM-DD HH:MM:SS (e.g. 2026-03-15 14:30:00). Podio\'s canonical write format.'),
+                    end: getDateConf('(End)',
+                        'Full end datetime, YYYY-MM-DD HH:MM:SS. Only for date ranges.'),
+                    start_date: getDateConf('(Start Date)',
+                        'Start date in YYYY-MM-DD format (e.g. 2026-03-15).'),
+                    start_time: getDateConf('(Start Time)',
+                        'Start time in HH:MM:SS format (e.g. 14:30:00). Only if the field includes time.'),
+                    end_date: getDateConf('(End Date)',
+                        'End date in YYYY-MM-DD format. Only for date ranges.'),
+                    end_time: getDateConf('(End Time)',
+                        'End time in HH:MM:SS format. Only for date ranges with time.'),
+                    start_utc: getDateConf('(Start Utc)',
+                        'UTC start datetime as returned by Podio. Read-only \u2014 set start or start_date/start_time when writing.'),
+                    end_utc: getDateConf('(End Utc)',
+                        'UTC end datetime as returned by Podio. Read-only \u2014 set end or end_date/end_time when writing.'),
+                    start_date_utc: getDateConf('(Start Date Utc)',
+                        'UTC start date as returned by Podio. Read-only.'),
+                    start_time_utc: getDateConf('(Start Time Utc)',
+                        'UTC start time as returned by Podio. Read-only.'),
+                    end_date_utc: getDateConf('(End Date Utc)',
+                        'UTC end date as returned by Podio. Read-only.'),
+                    end_time_utc: getDateConf('(End Time Utc)',
+                        'UTC end time as returned by Podio. Read-only.')
                 };
                 break;
             case 'location':

@@ -438,28 +438,6 @@
       },
       "dynamicMetadata": true
     },
-    "createItemDynamic": {
-      "main": "./lib/actions/items/createItemDynamic.js",
-      "title": "Item: Create (Dynamic)",
-      "description": "Create item — dynamic app_id, raw JSON payload (advanced).",
-      "fields": {
-        "hook": {
-          "label": "Execute Hooks",
-          "viewClass": "CheckBoxView"
-        },
-        "silent": {
-          "label": "Silent Mode",
-          "viewClass": "CheckBoxView"
-        },
-        "autoAddCategoryOptions": {
-          "label": "Auto-Add Missing Category Options",
-          "viewClass": "CheckBoxView"
-        }
-      },
-      "metadata": {
-        "in": "./lib/schemas/items/createItemDynamic.in.json"
-      }
-    },
     "createItemIdempotent": {
       "main": "./lib/actions/items/createItemIdempotent.js",
       "title": "Item: Create (Idempotent by external_id)",
