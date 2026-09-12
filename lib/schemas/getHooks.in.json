@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "properties": {
+    "ref_type": {
+      "type": "string",
+      "required": true,
+      "title": "Ref Type"
+    },
+    "ref_id": {
+      "type": "number",
+      "title": "Ref Id(Space_id or App_id or Field_id)",
+      "placeholder": "34343223",
+      "required": true
+    }
+  }
+}

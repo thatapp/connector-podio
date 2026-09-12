@@ -5,7 +5,7 @@
             "type": "string",
             "required": true,
             "title": "External ID",
-            "note": "The stable upstream record id that makes this call idempotent. Pass the same value here you used (or will use) on the corresponding `reconcileBatch` call. Without it, this action cannot detect that an item already exists for this record."
+            "note": "Stable upstream record id used for lookup and reconciliation. Podio does not enforce uniqueness: concurrent creates require separate durable caller coordination."
         },
         "fields": {
             "type": "object",

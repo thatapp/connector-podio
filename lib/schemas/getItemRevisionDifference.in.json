@@ -9,13 +9,13 @@
     },
     "revision_from": {
       "type": "number",
-      "required": false,
+      "required": true,
       "title": "From Revision",
       "description": "The starting revision number for comparison"
     },
     "revision_to": {
       "type": "number",
-      "required": false,
+      "required": true,
       "title": "To Revision",
       "description": "The ending revision number for comparison"
     }

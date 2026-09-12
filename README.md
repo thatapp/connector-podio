@@ -6,7 +6,7 @@ This component is an `elasticio-sailor-nodejs` connector exposing ~100 actions
 and 5 triggers against Podio's REST API at `https://api.podio.com`. It is
 hardened against the platform-side reliability classes documented below —
 the most important being safe-retry semantics for transient errors, an
-idempotent item-create pattern, and rate-limit-aware backoff.
+lookup-before-create item pattern, and rate-limit-aware backoff.
 
 ## Setup
 
@@ -117,27 +117,28 @@ You do not need to write a custom backoff loop.
 
 ### Reliable batch creation (the canonical pattern)
 
-The default `createItem` action **already does the right thing for
-individual records**: it propagates errors to the iPaaS execution UI's
-error channel, retryable errors auto-retry. For batches where you need a
-*guarantee* that every upstream record landed in Podio:
+The default `createItem` action reports failures through the iPaaS error
+channel. A failed response does not always mean that Podio rejected the write.
+For batches, reconcile the results against Podio before deciding what to retry:
 
 1. Make each upstream record carry a **stable upstream id** as `external_id`
    (source-system row id, UUID — anything unique per record).
-2. Use **`Item: Create (Idempotent by external_id)`** instead of `Item: Create`.
+2. Use **`Item: Create (Lookup by external_id)`** instead of `Item: Create`.
    It looks up by `external_id` first and returns the existing item if a
-   prior retry already landed it — no duplicates. The output's
+   prior attempt already landed it. This does not prevent concurrent duplicates.
+   Podio leaves external-ID uniqueness to the caller; a durable coordinator is
+   required across workers. The output's
    `_idempotent_status` field is `"existing"` or `"created"`.
 3. At the end of the batch, route the list of `external_ids` you tried to
    write into **`Item: Reconcile Batch (by external_id)`**. It returns
    `{found, missing, errors, *_count}` — `missing` lists exactly which
    upstream records did not make it to Podio.
-4. Route `missing.length > 0` back into `createItemIdempotent` to re-feed
-   the gaps.
+4. Resolve lookup errors and uncertain writes, then retry confirmed missing
+   records under the same caller coordination.
 
-This is belt-and-suspenders — you don't trust the iPaaS execution count,
-you trust Podio's own state. It is the standard pattern for high-stakes
-Podio integrations.
+Reconciliation checks observed state; it is not a lock or an exactly-once
+guarantee. The historical action key `createItemIdempotent` is retained for
+existing flows. See [Podio's external-ID contract](https://developers.podio.com/doc/items/get-item-by-external-id-19556702).
 
 ### Webhooks: the calculation-field trap
 

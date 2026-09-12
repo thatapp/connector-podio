@@ -8,7 +8,7 @@
       "description": "The ID of the item"
     },
     "field_id": {
-      "type": "number",
+      "type": ["number", "string"],
       "title": "Field ID or External ID",
       "required": true,
       "description": "The field_id (numeric) or external_id to retrieve values for"

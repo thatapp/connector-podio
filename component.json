@@ -222,7 +222,7 @@
     "getCommentRevision": {
       "main": "./lib/actions/comments/getCommentRevision.js",
       "title": "Comment: Get Revision",
-      "description": "Retrieve a specific revision of a comment",
+      "description": "Retrieve all revisions of a comment, oldest first, including current",
       "metadata": {
         "in": "./lib/schemas/getComment.in.json"
       }
@@ -393,7 +393,7 @@
       "title": "Hook: Get",
       "description": "Retrieve webhooks configured for an object",
       "metadata": {
-        "in": "./lib/schemas/createHooks.in.json"
+        "in": "./lib/schemas/getHooks.in.json"
       }
     },
     "verifyHooks": {
@@ -440,8 +440,8 @@
     },
     "createItemIdempotent": {
       "main": "./lib/actions/items/createItemIdempotent.js",
-      "title": "Item: Create (Idempotent by external_id)",
-      "description": "Retry-safe create by external_id. Pair with reconcileBatch for batch reliability.",
+      "title": "Item: Create (Lookup by external_id)",
+      "description": "Lookup before create by external_id. Requires serialized caller coordination; not concurrency-safe idempotency.",
       "fields": {
         "appId": {
           "viewClass": "TextFieldView",
