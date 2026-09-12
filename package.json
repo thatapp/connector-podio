@@ -7,7 +7,7 @@
     "node": "16.14.2"
   },
   "scripts": {
-    "test": "echo \"Warning: no test specified\" && exit 0",
+    "test": "npm run test:unit",
     "test:unit": "mocha \"test/specs/**/*.spec.js\" --recursive --timeout 5000 --exit",
     "test:integration": "node test/run.js",
     "run:action": "node test/run.js"
