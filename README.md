@@ -201,11 +201,11 @@ only v2 exists (the v1 unscoped global route is dead).
 
 The component exposes 5 triggers:
 
-- `getApplications` — polling: fetches one app by id; emits per cycle.
+- `getApplications` — polling: lists the active apps of one space (`GET /app/space/{space_id}/`; the space comes from the message, else the step configuration's `space_id` / `spaceId`); emits the `{app_id: name}` map per cycle. (Until 1.2.0 it read one app by id and could never emit.)
 - `getItems` — polling: fetches one item by id; emits per cycle.
-- `getOrganisations` — polling: fetches one org by id; emits per cycle.
+- `getOrganisations` — polling: lists the organisations the connected user belongs to (`GET /org/`; takes no input); emits the `{org_id: name}` map per cycle. (Until 1.2.0 it read one org by id and could never emit.)
 - `getSpaces` — polling: fetches spaces for an org.
-- `verifyHooks` — webhook receiver: handles Podio's hook-verification handshake.
+- `verifyHook` (file `lib/triggers/verifyHooks.js`) — webhook receiver: handles Podio's hook-verification handshake.
 
 **Note (in-progress):** A dedicated `podio-webhook` component is being
 designed to subsume the current two-flow webhook-install ceremony into a

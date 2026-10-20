@@ -1172,10 +1172,10 @@
     "getApplications": {
       "main": "./lib/triggers/getApplications.js",
       "title": "App: Poll for Changes",
-      "description": "Poll for new or updated applications",
+      "description": "Poll the active apps of one space (GET /app/space/{space_id}/); emits {app_id: name} each cycle",
       "type": "polling",
       "metadata": {
-        "in": "./lib/schemas/getApp.in.json"
+        "in": "./lib/schemas/getApplications.in.json"
       }
     },
     "getItems": {
@@ -1190,11 +1190,8 @@
     "getOrganisations": {
       "main": "./lib/triggers/getOrganisations.js",
       "title": "Org: Poll for Changes",
-      "description": "Poll for organization changes",
-      "type": "polling",
-      "metadata": {
-        "in": "./lib/schemas/getOrg.in.json"
-      }
+      "description": "Poll the organisations the connected user belongs to (GET /org/); emits {org_id: name} each cycle",
+      "type": "polling"
     },
     "getSpaces": {
       "main": "./lib/triggers/getSpaces.js",

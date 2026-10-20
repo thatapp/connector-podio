@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "properties": {
+    "space_id": {
+      "type": "string",
+      "required": true,
+      "title": "Space ID",
+      "description": "The space whose active apps are polled (GET /app/space/{space_id}/). When the message carries none, the step configuration's space_id or spaceId is used."
+    }
+  }
+}
