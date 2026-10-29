@@ -1,7 +1,7 @@
 {
   "type": "object",
   "properties": {
-    "app_id": {
+    "org_id": {
       "type": "number",
       "title": "Org Id",
       "required": true,

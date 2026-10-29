@@ -1,7 +1,7 @@
 {
   "type": "object",
   "properties": {
-    "app_id": {
+    "space_id": {
       "type": "number",
       "title": "Space Id",
       "required": true,
