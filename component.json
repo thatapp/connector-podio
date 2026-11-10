@@ -1,7 +1,7 @@
 {
+  "version": "1.3.1",
   "title": "Podio",
   "description": "Podio Project Management and Collaboration Software",
-  "buildType": "docker",
   "envVars": {
     "PODIO_APP_ID": {
       "required": true,

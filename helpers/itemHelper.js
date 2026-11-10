@@ -270,7 +270,7 @@ function toMessageBody(v) {
 // always split.) Callers should `await` this so every emit flushes before the
 // action's process promise resolves.
 exports.emitData = async (cfg, result, that, end = null) => {
-    const { messages } = require('elasticio-node');
+    const { messages } = require('./messages');
 
     if (Array.isArray(result)) {
         for (const i_item of result) {

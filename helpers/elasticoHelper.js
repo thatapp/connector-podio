@@ -1,6 +1,6 @@
 'use strict';
 
-const { messages } = require('elasticio-node');
+const { messages } = require('./messages');
 
 exports.emit = async (obj, data) => {
     await messages.emitSnapshot.call(obj, data);

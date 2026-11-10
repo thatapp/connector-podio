@@ -7,7 +7,7 @@ var util = require('util');
 var oauthUtils = require('./helpers/oauth-utils.js');
 var errors = require('./helpers/errors.js');
 const axios = require('axios');
-var handlebars = require('hbs').handlebars;
+var handlebars = require('handlebars');
 
 // In-process lock around OAuth token refresh. When multiple actions race to
 // refresh (typically during a large batch that crosses the 8h token boundary),
