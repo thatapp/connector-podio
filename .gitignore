@@ -4,3 +4,4 @@ node_modules
 play
 # Local Claude Code tool permissions — machine state, not product
 .claude/settings.local.json
+.globalEnv
