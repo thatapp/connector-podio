@@ -1,6 +1,6 @@
 {
   "name": "podio-component",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Podio API integration component template for thatapp.io platform",
   "main": "index.js",
   "engines": {
