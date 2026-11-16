@@ -1181,10 +1181,10 @@
     "getItems": {
       "main": "./lib/triggers/getItems.js",
       "title": "Item: Poll for Changes",
-      "description": "Poll for new or updated items",
+      "description": "Poll for new or updated items in an application (POST /item/app/{app_id}/filter/, newest edit first), or one item by item_id; emits each item changed since the last poll",
       "type": "polling",
       "metadata": {
-        "in": "./lib/schemas/getItem.in.json"
+        "in": "./lib/schemas/getItems.in.json"
       }
     },
     "getOrganisations": {

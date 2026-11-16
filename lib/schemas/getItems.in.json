@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "properties": {
+    "app_id": {
+      "type": "string",
+      "title": "App ID",
+      "description": "The app whose new or updated items are polled (POST /item/app/{app_id}/filter/, newest edit first). Used when no item_id is given; the message's value is used first, then the step configuration's app_id or appId.",
+      "placeholder": "e.g., 12345678"
+    },
+    "item_id": {
+      "type": "string",
+      "title": "Item ID",
+      "description": "The ID of the item to poll (GET /item/{item_id}); the item is returned when it changed since the last poll. When given, it is polled instead of the app.",
+      "placeholder": "e.g., 12345678"
+    },
+    "limit": {
+      "type": "number",
+      "title": "Limit",
+      "description": "How many of the app's most recently edited items each poll reads (default 30, at most 500)."
+    }
+  }
+}
