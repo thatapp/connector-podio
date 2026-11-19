@@ -1209,6 +1209,14 @@
       "metadata": {
         "in": "./lib/schemas/verifyHooks.in.json"
       }
+    },
+    "hookVerifyOrGetItem": {
+      "main": "./lib/triggers/hookVerifyOrGetItem.js",
+      "title": "Hook: Verify or Get Item",
+      "description": "Receive a Podio hook delivery in one step: a hook validation (hook.verify) is answered with POST /hook/{hook_id}/verify/validate and ends with no data; any other delivery that names an item reads it with GET /item/{item_id} and emits the item, as Item: Get does; an item.delete, or a delivery that names no item, is passed through unchanged",
+      "metadata": {
+        "in": "./lib/schemas/hookVerifyOrGetItem.in.json"
+      }
     }
   }
 }
