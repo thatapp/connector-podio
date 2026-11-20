@@ -95,7 +95,7 @@ Key files:
   (mailbox, calendar_code, push.signature, access_token, refresh_token).
 - `lib/actions/` — ~100 action files grouped by Podio area (items, apps,
   comments, files, hooks, etc.).
-- `lib/triggers/` — 5 polling/webhook-receiver triggers.
+- `lib/triggers/` — 6 polling/webhook-receiver triggers.
 
 ## Operational notes
 
@@ -199,13 +199,14 @@ only v2 exists (the v1 unscoped global route is dead).
 
 ## Triggers
 
-The component exposes 5 triggers:
+The component exposes 6 triggers:
 
 - `getApplications` — polling: lists the active apps of one space (`GET /app/space/{space_id}/`; the space comes from the message, else the step configuration's `space_id` / `spaceId`); emits the `{app_id: name}` map per cycle. (Until 1.2.0 it read one app by id and could never emit.)
 - `getItems` — polling: fetches one item by id; emits per cycle.
 - `getOrganisations` — polling: lists the organisations the connected user belongs to (`GET /org/`; takes no input); emits the `{org_id: name}` map per cycle. (Until 1.2.0 it read one org by id and could never emit.)
 - `getSpaces` — polling: fetches spaces for an org.
 - `verifyHook` (file `lib/triggers/verifyHooks.js`) — webhook receiver: handles Podio's hook-verification handshake.
+- `hookVerifyOrGetItem` (Hook: Verify or Get Item) — webhook receiver in one step (GitLab #497): a `hook.verify` delivery is answered with `POST /hook/{hook_id}/verify/validate` and ends with no data; any other delivery that names an item reads `GET /item/{item_id}` and emits the item, the same output as Item: Get; an `item.delete`, or a delivery that names no item, is passed through unchanged. It replaces the receive, route-by-event, verify and get-item steps a Podio flow needed before.
 
 **Note (in-progress):** A dedicated `podio-webhook` component is being
 designed to subsume the current two-flow webhook-install ceremony into a

@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "required": false,
+      "title": "Event type",
+      "description": "The Podio hook event, for example item.create, item.update, item.delete or hook.verify"
+    },
+    "hook_id": {
+      "type": "number",
+      "required": false,
+      "title": "hook_id",
+      "description": "The Podio hook that sent the delivery; needed for a hook validation"
+    },
+    "code": {
+      "type": "string",
+      "required": false,
+      "title": "Hooks verification code",
+      "description": "Present only on a hook validation (hook.verify)"
+    },
+    "item_id": {
+      "type": "string",
+      "required": false,
+      "title": "Item ID",
+      "description": "The item the delivery names; read with GET /item/{item_id} unless the event is item.delete"
+    }
+  }
+}
