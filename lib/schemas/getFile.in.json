@@ -2,7 +2,7 @@
   "type": "object",
   "properties": {
     "file_id": {
-      "type": "string",
+      "type": ["number", "string"],
       "required": true,
       "title": "File ID",
       "description": "The unique identifier of the file to retrieve"

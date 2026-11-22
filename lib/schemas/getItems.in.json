@@ -8,7 +8,7 @@
       "placeholder": "e.g., 12345678"
     },
     "item_id": {
-      "type": "string",
+      "type": ["number", "string"],
       "title": "Item ID",
       "description": "The ID of the item to poll (GET /item/{item_id}); the item is returned when it changed since the last poll. When given, it is polled instead of the app.",
       "placeholder": "e.g., 12345678"

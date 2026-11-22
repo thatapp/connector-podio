@@ -1202,9 +1202,36 @@
     }
   },
   "triggers": {
+    "pollApp": {
+      "main": "./lib/triggers/pollApp.js",
+      "title": "App: Poll for Changes",
+      "description": "Emit the selected app on first read and when its provider data changes.",
+      "type": "polling",
+      "metadata": {
+        "in": "./lib/schemas/getApp.in.json"
+      }
+    },
+    "pollOrg": {
+      "main": "./lib/triggers/pollOrg.js",
+      "title": "Org: Poll for Changes",
+      "description": "Emit the selected org on first read and when its provider data changes.",
+      "type": "polling",
+      "metadata": {
+        "in": "./lib/schemas/getOrg.in.json"
+      }
+    },
+    "pollSpace": {
+      "main": "./lib/triggers/pollSpace.js",
+      "title": "Space: Poll for Changes",
+      "description": "Emit the selected space on first read and when its provider data changes.",
+      "type": "polling",
+      "metadata": {
+        "in": "./lib/schemas/getSpace.in.json"
+      }
+    },
     "getApplications": {
       "main": "./lib/triggers/getApplications.js",
-      "title": "App: Poll for Changes",
+      "title": "App: Poll Apps in Space",
       "description": "Poll the active apps of one space (GET /app/space/{space_id}/); emits {app_id: name} each cycle",
       "type": "polling",
       "metadata": {
@@ -1222,13 +1249,13 @@
     },
     "getOrganisations": {
       "main": "./lib/triggers/getOrganisations.js",
-      "title": "Org: Poll for Changes",
+      "title": "Org: Poll Visible Organizations",
       "description": "Poll the organisations the connected user belongs to (GET /org/); emits {org_id: name} each cycle",
       "type": "polling"
     },
     "getSpaces": {
       "main": "./lib/triggers/getSpaces.js",
-      "title": "Space: Poll for Changes",
+      "title": "Space: Poll Spaces in Organization",
       "description": "Poll for new or updated spaces",
       "type": "polling",
       "metadata": {

@@ -2,13 +2,13 @@
   "type": "object",
   "properties": {
     "app_id": {
-      "type": "string",
+      "type": ["number", "string"],
       "required": true,
       "title": "App ID",
       "description": "The unique identifier of the app containing the field"
     },
     "field_id": {
-      "type": "string",
+      "type": ["number", "string"],
       "required": true,
       "title": "Field ID or External ID",
       "description": "The field_id (numeric) or external_id (string) of the field to retrieve"
