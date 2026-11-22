@@ -46,6 +46,12 @@ Podio.prototype.request = function (method, path, params, formData, headers) {
         json: true
     };
 
+    // Podio's numeric raw-file route returns bytes, including for text attachments.
+    const rawFile = method === 'GET' && /^\/file\/[1-9]\d*\/raw$/.test(path);
+    if (rawFile) {
+        requestParams.json = false;
+        requestParams.encoding = null;
+    }
     if (formData) {
         requestParams.formData = formData;
     }
@@ -61,6 +67,13 @@ Podio.prototype.request = function (method, path, params, formData, headers) {
     request(requestParams, responseHandler);
 
     async function responseHandler(err, response, body) {
+        if (rawFile && response && Buffer.isBuffer(body)) {
+            if (response.statusCode >= 200 && response.statusCode < 300) {
+                body = body.toString('base64');
+            } else {
+                try { body = JSON.parse(body.toString('utf8')); } catch (_) { body = {}; }
+            }
+        }
         if (err) {
             // Transport-level error (network, DNS, timeout). Mark retryable so
             // the iPaaS sailor auto-retries per its 10-retry exponential-backoff
