@@ -33,6 +33,13 @@ describe('the Podio upload steps reach the file proxy through the platform, with
         }
     });
 
+    it('maps documented base64 data to the upload proxy source', async function () {
+        await publicUrl.call(context, { body: { data: 'dGVzdA==', filename: 'receipt.txt' } }, CFG);
+        assert.strictEqual(post.callCount, 1);
+        assert.strictEqual(post.firstCall.args[1].source, 'dGVzdA==');
+        assert.strictEqual(context.emit.firstCall.args[1].body.file_id, 1);
+    });
+
     for (const step of STEPS) {
         it(`${step.name} posts to the platform address it was given, never to a fixed host`, async function () {
             await step.run.call(context, { body: step.body }, CFG);

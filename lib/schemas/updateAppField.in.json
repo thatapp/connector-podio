@@ -38,6 +38,11 @@
         "true": "true",
         "false": "false"
       }
+    },
+    "config": {
+      "type": "object",
+      "title": "Config",
+      "required": true
     }
   }
 }

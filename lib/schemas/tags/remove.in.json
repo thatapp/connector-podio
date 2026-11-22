@@ -16,8 +16,13 @@
     "text": {
       "type": "string",
       "title": "Tag",
-      "required": true,
+      "required": false,
       "placeholder": "The tag to be deleted"
+    },
+    "tag": {
+      "type": "string",
+      "title": "Tag",
+      "required": true
     }
   }
 }

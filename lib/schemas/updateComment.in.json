@@ -44,7 +44,28 @@
           "required": false,
           "description": "URL to embed (will be resolved automatically)"
         }
-      }
+      },
+      "required": false
+    },
+    "value": {
+      "type": "string",
+      "title": "Value",
+      "required": false
+    },
+    "external_id": {
+      "type": "string",
+      "title": "External id",
+      "required": false
+    },
+    "file_ids": {
+      "type": "array",
+      "title": "File ids",
+      "required": false
+    },
+    "embed_url": {
+      "type": "string",
+      "title": "Embed url",
+      "required": false
     }
   }
 }

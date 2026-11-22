@@ -18,6 +18,11 @@
       ],
       "required": false,
       "title": "Silent"
+    },
+    "config": {
+      "type": "object",
+      "title": "Config",
+      "required": true
     }
   }
 }

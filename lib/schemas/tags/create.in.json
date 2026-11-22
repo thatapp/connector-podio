@@ -16,8 +16,16 @@
     "text": {
       "type": "string",
       "title": "Tag(s)",
-      "required": true,
+      "required": false,
       "placeholder": "Seperate tags with a comma. E.g. tag_1, tag_2"
+    },
+    "tags": {
+      "type": "array",
+      "title": "Tags",
+      "required": true,
+      "items": {
+        "type": "string"
+      }
     }
   }
 }

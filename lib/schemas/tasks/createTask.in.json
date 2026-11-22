@@ -72,6 +72,16 @@
       "type": "string",
       "title": "External ID",
       "description": "External system reference ID"
+    },
+    "reminder": {
+      "type": "object",
+      "title": "Reminder",
+      "required": false
+    },
+    "recurrence": {
+      "type": "object",
+      "title": "Recurrence",
+      "required": false
     }
   }
 }

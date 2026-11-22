@@ -7,6 +7,16 @@
       "title": "Item ID",
       "description": "The unique identifier of the item to delete. WARNING: This action cannot be undone.",
       "placeholder": "e.g., 12345678"
+    },
+    "hook": {
+      "type": "boolean",
+      "title": "Hook",
+      "required": false
+    },
+    "silent": {
+      "type": "boolean",
+      "title": "Silent",
+      "required": false
     }
   }
 }
