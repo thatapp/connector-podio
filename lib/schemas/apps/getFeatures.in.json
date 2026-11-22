@@ -1,21 +1,26 @@
 {
-    "type": "object",
-    "properties": {
-        "app_ids": {
-            "type": "string",
-            "required": true,
-            "title": "App IDs",
-            "note": "Required. A single Podio app id (e.g. \"19894741\") or a comma-separated list. NOTE: multi-app calls require all apps to belong to the SAME Podio space — mixing spaces returns 400 'Apps not from same space' from Podio."
-        },
-        "include_space": {
-            "type": "SelectView",
-            "required": false,
-            "title": "Include Space",
-            "note": "When true, the response includes the space context for each app's features.",
-            "model": {
-              "true": "true",
-              "false": "false"
-            }
-        }
+  "type": "object",
+  "properties": {
+    "app_ids": {
+      "type": "string",
+      "required": false,
+      "title": "App IDs",
+      "note": "Required. A single Podio app id (e.g. \"19894741\") or a comma-separated list. NOTE: multi-app calls require all apps to belong to the SAME Podio space — mixing spaces returns 400 'Apps not from same space' from Podio."
+    },
+    "include_space": {
+      "type": "SelectView",
+      "required": false,
+      "title": "Include Space",
+      "note": "When true, the response includes the space context for each app's features.",
+      "model": {
+        "true": "true",
+        "false": "false"
+      }
+    },
+    "app_id": {
+      "type": "number",
+      "title": "App id",
+      "required": true
     }
+  }
 }

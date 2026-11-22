@@ -9,7 +9,7 @@
     },
     "name": {
       "type": "string",
-      "required": true,
+      "required": false,
       "title": "App Name",
       "description": "The name of the app"
     },
@@ -21,7 +21,8 @@
     "item_name": {
       "type": "string",
       "title": "Item Name",
-      "description": "Label for individual items in the app (e.g., 'Task', 'Project')"
+      "description": "Label for individual items in the app (e.g., 'Task', 'Project')",
+      "required": false
     },
     "description": {
       "type": "string",
@@ -91,6 +92,11 @@
       "type": "array",
       "title": "Fields",
       "description": "Array of field definitions to create with the app"
+    },
+    "config": {
+      "type": "object",
+      "title": "Config",
+      "required": true
     }
   }
 }

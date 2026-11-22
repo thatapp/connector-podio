@@ -3,13 +3,18 @@
   "properties": {
     "app_id": {
       "type": "number",
-      "required": true,
+      "required": false,
       "title": "App Id"
     },
     "view_id_or_name": {
       "type": "number",
-      "required": true,
+      "required": false,
       "title": "View Id Or Name"
+    },
+    "view_id": {
+      "type": "number",
+      "title": "View id",
+      "required": true
     }
   }
 }

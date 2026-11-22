@@ -1,15 +1,20 @@
 {
-    "type": "object",
-    "properties": {
-        "space_id": {
-            "type": "string",
-            "required": true,
-            "title": "Space Id"
-        },
-        "url_label": {
-            "type": "string",
-            "required": true,
-            "title": "Url Label"
-        }
+  "type": "object",
+  "properties": {
+    "space_id": {
+      "type": "string",
+      "required": true,
+      "title": "Space Id"
+    },
+    "url_label": {
+      "type": "string",
+      "required": false,
+      "title": "Url Label"
+    },
+    "app_slug": {
+      "type": "string",
+      "title": "App slug",
+      "required": true
     }
+  }
 }

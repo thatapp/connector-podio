@@ -15,7 +15,7 @@
     },
     "label": {
       "type": "string",
-      "required": true,
+      "required": false,
       "title": "Field Label",
       "description": "The label users will see for this field"
     },
@@ -46,6 +46,11 @@
       "type": "object",
       "title": "Settings",
       "description": "Field-type-specific settings (varies by field type)"
+    },
+    "config": {
+      "type": "object",
+      "title": "Config",
+      "required": true
     }
   }
 }

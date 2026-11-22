@@ -1,20 +1,35 @@
 {
-    "type": "object",
-    "properties": {
-        "org_label": {
-            "type": "string",
-            "required": true,
-            "title": "Org Label"
-        },
-        "space_label": {
-            "type": "string",
-            "required": true,
-            "title": "Space Label"
-        },
-        "app_label": {
-            "type": "string",
-            "required": true,
-            "title": "App Label"
-        }
+  "type": "object",
+  "properties": {
+    "org_label": {
+      "type": "string",
+      "required": false,
+      "title": "Org Label"
+    },
+    "space_label": {
+      "type": "string",
+      "required": false,
+      "title": "Space Label"
+    },
+    "app_label": {
+      "type": "string",
+      "required": false,
+      "title": "App Label"
+    },
+    "app_slug": {
+      "type": "string",
+      "title": "App slug",
+      "required": true
+    },
+    "org_slug": {
+      "type": "string",
+      "title": "Org slug",
+      "required": true
+    },
+    "space_slug": {
+      "type": "string",
+      "title": "Space slug",
+      "required": true
     }
+  }
 }
