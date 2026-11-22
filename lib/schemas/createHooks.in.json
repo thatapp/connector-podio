@@ -3,8 +3,8 @@
   "properties": {
     "ref_type": {
       "type": "string",
-      "required": true,
-      "title": "Ref Type"
+      "required": false,
+      "title": "Ref Type (legacy mapping)"
     },
     "ref_id": {
       "type": "number",
