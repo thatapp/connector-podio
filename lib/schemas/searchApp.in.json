@@ -58,6 +58,16 @@
       ],
       "required": false,
       "title": "highlights"
+    },
+    "limit": {
+      "type": "number",
+      "title": "Limit",
+      "required": false
+    },
+    "offset": {
+      "type": "number",
+      "title": "Offset",
+      "required": false
     }
   }
 }

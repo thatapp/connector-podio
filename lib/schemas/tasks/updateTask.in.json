@@ -82,6 +82,21 @@
       "type": "number",
       "title": "Reminder (minutes)",
       "description": "Minutes before due date to send reminder (empty to remove)"
+    },
+    "external_id": {
+      "type": "string",
+      "title": "External id",
+      "required": false
+    },
+    "reminder": {
+      "type": "object",
+      "title": "Reminder",
+      "required": false
+    },
+    "recurrence": {
+      "type": "object",
+      "title": "Recurrence",
+      "required": false
     }
   }
 }

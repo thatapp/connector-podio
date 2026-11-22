@@ -3,20 +3,34 @@
   "properties": {
     "space_t_id": {
       "type": "number",
-      "required": true,
+      "required": false,
       "title": "Space id"
     },
     "user_t_id": {
       "type": "number",
       "title": "User ID",
       "placeholder": "34343223",
-      "required": true
+      "required": false
     },
     "role_t": {
+      "type": "string",
+      "title": "Role",
+      "required": false
+    },
+    "space_id": {
+      "type": "number",
+      "title": "Space id",
+      "required": true
+    },
+    "user_id": {
+      "type": "number",
+      "title": "User id",
+      "required": true
+    },
+    "role": {
       "type": "string",
       "title": "Role",
       "required": true
     }
   }
 }
-

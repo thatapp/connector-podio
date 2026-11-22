@@ -3,13 +3,18 @@
   "properties": {
     "source": {
       "type": "string",
-      "required": true,
+      "required": false,
       "title": "Source"
     },
     "filename": {
       "type": "string",
       "required": true,
       "title": "Filename"
+    },
+    "data": {
+      "type": "string",
+      "title": "Data",
+      "required": true
     }
   }
 }
