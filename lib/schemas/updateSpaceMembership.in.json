@@ -6,10 +6,13 @@
       "required": true,
       "title": "Space id"
     },
+    "user_id": {
+      "type": "number",
+      "title": "User Id"
+    },
     "user_ids": {
       "type": "number",
-      "required": true,
-      "title": "User Id"
+      "title": "User Id (legacy mapping)"
     },
     "role": {
       "type": "string",

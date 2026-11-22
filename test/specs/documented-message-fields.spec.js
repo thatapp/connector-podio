@@ -26,9 +26,9 @@ describe('Documented comment, task, search and membership inputs', function () {
 
     it('supports nested comment input and explicit updates that clear fields', async function () {
         await run('addComment', { type: 'item', id: 10, data: { value: 'Before' } });
-        await run('updateComment', { comment_id: 12, data: { external_id: 'prior', file_ids: [11] }, value: '', file_ids: [] });
+        await run('updateComment', { comment_id: 12, data: { external_id: 'prior', file_ids: [11] }, value: '', file_ids: [] }, { silent: true });
         assert.deepStrictEqual(post.firstCall.args, ['/comment/item/10', { value: 'Before' }]);
-        assert.deepStrictEqual(put.firstCall.args, ['/comment/12', { external_id: 'prior', value: '', file_ids: [] }]);
+        assert.deepStrictEqual(put.firstCall.args, ['/comment/12?silent=1', { external_id: 'prior', value: '', file_ids: [] }]);
     });
 
     it('creates both referenced and standalone tasks with explicit notification settings', async function () {
@@ -76,5 +76,9 @@ describe('Documented comment, task, search and membership inputs', function () {
         await run('updateSpaceMembershipV2', { space_t_id: '11', user_t_id: '12', role_t: 'light' });
         assert.deepStrictEqual(put.firstCall.args, ['/space/11/member/12', { role: 'light' }]);
         assert.deepStrictEqual(put.secondCall.args, put.firstCall.args);
+        await run('updateSpaceMembership', { space_id: 11, user_id: 12, role: 'light' });
+        await run('updateSpaceMembership', { space_id: 11, user_ids: 12, role: 'light' });
+        assert.deepStrictEqual(put.thirdCall.args, put.firstCall.args);
+        assert.deepStrictEqual(put.lastCall.args, put.firstCall.args);
     });
 });
