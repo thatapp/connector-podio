@@ -30,6 +30,52 @@
     }
   },
   "actions": {
+    "lookupObjectById": {
+      "main": "./lib/actions/all/lookupObjectById.js",
+      "title": "Lookup Object By ID",
+      "description": "Access one selected Podio object by its ID.",
+      "fields": {
+        "objectType": {
+          "viewClass": "SelectView",
+          "label": "Object Type",
+          "required": true,
+          "model": {
+            "item": "Item",
+            "app": "Application",
+            "comment": "Comment",
+            "task": "Task",
+            "file": "File",
+            "space": "Workspace",
+            "org": "Organization",
+            "view": "View"
+          }
+        }
+      },
+      "metadata": {
+        "in": "./lib/schemas/objectId.in.json"
+      }
+    },
+    "deleteObjectById": {
+      "main": "./lib/actions/all/deleteObjectById.js",
+      "title": "Delete Object By ID",
+      "description": "Delete one selected Podio object and return its ID.",
+      "fields": {
+        "objectType": {
+          "viewClass": "SelectView",
+          "label": "Object Type",
+          "required": true,
+          "model": {
+            "item": "Item",
+            "app": "Application",
+            "comment": "Comment",
+            "task": "Task"
+          }
+        }
+      },
+      "metadata": {
+        "in": "./lib/schemas/objectId.in.json"
+      }
+    },
     "activateApp": {
       "main": "./lib/actions/apps/activateApp.js",
       "title": "App: Activate",
@@ -277,7 +323,7 @@
     },
     "attachFile": {
       "main": "./lib/actions/files/attachFile.js",
-      "title": "File: Attach File",
+      "title": "Files: Attach File",
       "description": "Attach an uploaded file to a Podio object",
       "fields": {
         "ref_type": {
@@ -324,7 +370,7 @@
     },
     "getFilesbyApp": {
       "main": "./lib/actions/files/getFilesbyApp.js",
-      "title": "File: Get All by App",
+      "title": "Files: Get All by App",
       "description": "Retrieve all files attached to items in an app",
       "metadata": {
         "in": "./lib/schemas/getFilesbyApp.in.json"
@@ -356,7 +402,7 @@
     },
     "createHooks": {
       "main": "./lib/actions/hooks/createHooks.js",
-      "title": "Hook: Create",
+      "title": "Hooks: Create",
       "description": "Create Podio webhooks. Set appId for calc-field guard (calc fields never fire).",
       "fields": {
         "hookType": {
@@ -390,7 +436,7 @@
     },
     "deleteHooks": {
       "main": "./lib/actions/hooks/deleteHooks.js",
-      "title": "Hook: Delete",
+      "title": "Hooks: Delete",
       "description": "Remove a webhook",
       "metadata": {
         "in": "./lib/schemas/deleteHooks.in.json"
@@ -398,7 +444,7 @@
     },
     "getHooks": {
       "main": "./lib/actions/hooks/getHooks.js",
-      "title": "Hook: Get",
+      "title": "Hooks: Get",
       "description": "Retrieve webhooks configured for an object",
       "metadata": {
         "in": "./lib/schemas/getHooks.in.json"
@@ -505,7 +551,7 @@
     },
     "filterItems": {
       "main": "./lib/actions/all/filterItems.js",
-      "title": "Item: Filter",
+      "title": "Items: Filter",
       "description": "Filter items in an app (auto-paginated)",
       "metadata": {
         "in": "./lib/schemas/filterItems.in.json"
@@ -513,7 +559,7 @@
     },
     "filterItemsByView": {
       "main": "./lib/actions/items/filterItembyView.js",
-      "title": "Item: Filter by View",
+      "title": "Items: Filter by View",
       "description": "Filter items using a saved view's criteria",
       "metadata": {
         "in": "./lib/schemas/filterItembyView.in.json"
@@ -535,7 +581,7 @@
     },
     "getItemsbyApp": {
       "main": "./lib/actions/items/getItemsbyApp.js",
-      "title": "Item: Get All by App",
+      "title": "Items: Get All by App",
       "description": "Retrieve all items in an app",
       "metadata": {
         "in": "./lib/schemas/getItemsbyApp.in.json"
@@ -551,7 +597,7 @@
     },
     "getItemFieldValueV2": {
       "main": "./lib/actions/items/getItemFieldValueV2.js",
-      "title": "Item: Get Field Value (v2)",
+      "title": "Item: Get Field Values V2",
       "description": "Retrieve values for a specific field on an item (V2 format)",
       "metadata": {
         "in": "./lib/schemas/items/getItemFieldValueV2.in.json"
@@ -583,7 +629,7 @@
     },
     "getItemValue": {
       "main": "./lib/actions/items/getItemV2.js",
-      "title": "Item: Get Values (v2)",
+      "title": "Item: Get Value V2",
       "description": "Get item field values (V2 simplified format)",
       "metadata": {
         "in": "./lib/schemas/getItem.in.json"
@@ -721,7 +767,7 @@
     },
     "searchOrg": {
       "main": "./lib/actions/all/searchOrg.js",
-      "title": "Search: Organization (v1)",
+      "title": "Search: Organization",
       "description": "Search within an org (v1, bare array). See searchOrgV2 for facet counts.",
       "fields": {
         "orgId": {
@@ -751,7 +797,7 @@
     },
     "searchSpace": {
       "main": "./lib/actions/all/searchSpace.js",
-      "title": "Search: Space (v1)",
+      "title": "Search: Space",
       "description": "Search within a space (v1, bare array). See searchSpaceV2 for facet counts.",
       "fields": {
         "orgId": {
