@@ -13,8 +13,8 @@ function setting(value, fallback, name, max = Number.MAX_SAFE_INTEGER) {
 const networkErrors = new Set(["ECONNRESET", "ETIMEDOUT", "ESOCKETTIMEDOUT", "EAI_AGAIN", "ECONNREFUSED"]);
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-async function withPodioRetries(cfg, method, send, wait = sleep) {
-  const retries = setting(cfg?.retries, 5, "Number of retries");
+async function withPodioRetries(cfg, method, send, wait = sleep, deadline = Date.now() + 60000) {
+  const retries = setting(cfg?.retries, 5, "Number of retries", 10);
   const delay = setting(cfg?.retryDelay, 10000, "Delay between retries", 2147483647);
   for (let attempt = 0; ; attempt++) {
     try {
@@ -25,11 +25,18 @@ async function withPodioRetries(cfg, method, send, wait = sleep) {
       const transient = (status >= 500 && status < 600) || networkErrors.has(error?.code);
       // A disconnected or failed write may already have reached Podio.
       const repeat = refused || (method === "GET" && transient);
-      if (!repeat || attempt >= retries) {
+      // Leave time to return the actual provider error to the caller. A late wake
+      // (event-loop pressure, suspended worker) must not start another request.
+      const retryCutoff = deadline - 1000;
+      if (!repeat || attempt >= retries || Date.now() + delay >= retryCutoff) {
         if (error && typeof error === "object" && (repeat || transient)) error.retry = false;
         throw error;
       }
       await wait(delay);
+      if (Date.now() >= retryCutoff) {
+        if (error && typeof error === "object") error.retry = false;
+        throw error;
+      }
     }
   }
 }

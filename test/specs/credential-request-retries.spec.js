@@ -29,6 +29,34 @@ describe("credential request retries", function () {
     assert.deepEqual(waits, Array(5).fill(10000));
   });
 
+  it("rejects excessive counts before issuing a request", async () => {
+    let calls = 0;
+    await assert.rejects(withPodioRetries({ retries: 11, retryDelay: 0 }, "GET", () => { calls++; }), /Number of retries/);
+    assert.equal(calls, 0);
+  });
+
+  it("returns the original rate limit when the next wait exceeds the host deadline", async () => {
+    const provider = Object.assign(new Error("busy"), { statusCode: 420 });
+    let waits = 0, calls = 0;
+    const send = async () => { calls++; throw provider; };
+    await assert.rejects(withPodioRetries({}, "GET", send, async () => { waits++; }, Date.now() + 100),
+      error => error === provider && error.retry === false);
+    assert.equal(calls, 1);
+    assert.equal(waits, 0);
+  });
+
+  it("cannot issue another request after a late wake", async () => {
+    const sinon = require("sinon"), clock = sinon.useFakeTimers({ now: 100, toFake: ["Date"] });
+    try {
+      const provider = Object.assign(new Error("busy"), { statusCode: 429 });
+      let calls = 0;
+      const send = async () => { calls++; throw provider; };
+      await assert.rejects(withPodioRetries({ retryDelay: 10 }, "POST", send, async () => clock.tick(10000), 5000),
+        error => error === provider && error.retry === false);
+      assert.equal(calls, 1);
+    } finally { clock.restore(); }
+  });
+
   it("retries a transient provider read and returns the successful result", async () => {
     const server = nock(api).get("/item/5").reply(503, {}).get("/item/5").reply(200, { item_id: 5 });
     assert.equal((await new Podio(cfg).get("/item/5")).item_id, 5);
