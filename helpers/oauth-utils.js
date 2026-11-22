@@ -134,7 +134,7 @@ function refreshAppToken(app, conf, cb) {
     var appDef = require('../component.json');
     var credentials = appDef.credentials || {};
     var oauth2 = credentials["oauth2"];
-    refreshToken(
+    return refreshToken(
         oauth2['token_uri'],
         oauth2['client_id'],
         oauth2['client_secret'],
