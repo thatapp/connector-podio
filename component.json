@@ -124,6 +124,14 @@
         "in": "./lib/schemas/apps/getAppSpaceByUrlLabel.in.json"
       }
     },
+    "getAppInverseDependencies": {
+      "main": "./lib/actions/apps/getAppInverseDependencies.js",
+      "title": "App: Get Inverse Dependencies",
+      "description": "Get apps that depend ON this app (have reference fields pointing to it)",
+      "metadata": {
+        "in": "./lib/schemas/apps/getAppInverseDependencies.in.json"
+      }
+    },
     "getAppDependencies": {
       "main": "./lib/actions/apps/getAppDependencies.js",
       "title": "App: Get Dependencies",
@@ -410,6 +418,31 @@
       "description": "Create a copy of an existing item",
       "metadata": {
         "in": "./lib/schemas/cloneItem.in.json"
+      }
+    },
+    "createItemDynamic": {
+      "main": "./lib/actions/items/createItemDynamic.js",
+      "title": "Item: Create (Dynamic)",
+      "description": "Create item with dynamic app_id and raw JSON payload - no schema lookup. Advanced mode for routing to any app.",
+      "fields": {
+        "hook": {
+          "label": "Execute Hooks",
+          "viewClass": "CheckBoxView",
+          "note": "Execute webhooks and automation flows for this change (default: true)"
+        },
+        "silent": {
+          "label": "Silent Mode",
+          "viewClass": "CheckBoxView",
+          "note": "Suppress notifications and activity stream updates (default: false)"
+        },
+        "autoAddCategoryOptions": {
+          "label": "Auto-Add Missing Category Options",
+          "viewClass": "CheckBoxView",
+          "note": "Automatically add missing category values to the app field configuration before creating the item"
+        }
+      },
+      "metadata": {
+        "in": "./lib/schemas/items/createItemDynamic.in.json"
       }
     },
     "createItem": {
