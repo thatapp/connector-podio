@@ -1,0 +1,47 @@
+{
+  "type": "object",
+  "properties": {
+    "app_id": {
+      "type": "number",
+      "required": true,
+      "title": "App ID",
+      "description": "The ID of the app to create the item in (can be passed dynamically from previous steps)"
+    },
+    "fields": {
+      "type": "object",
+      "required": true,
+      "title": "Fields",
+      "description": "Object with field external_ids or field_ids as keys and field values. Structure must match the target app's schema."
+    },
+    "external_id": {
+      "type": "string",
+      "title": "External ID",
+      "description": "Optional external identifier for the item"
+    },
+    "tags": {
+      "type": "array",
+      "title": "Tags",
+      "description": "Array of tags to apply to the item"
+    },
+    "file_ids": {
+      "type": "array",
+      "title": "File IDs"
+    },
+    "reminder": {
+      "type": "object",
+      "title": "Reminder"
+    },
+    "recurrence": {
+      "type": "object",
+      "title": "Recurrence"
+    },
+    "linked_account_id": {
+      "type": "number",
+      "title": "Linked account ID"
+    },
+    "ref": {
+      "type": "object",
+      "title": "Reference"
+    }
+  }
+}
