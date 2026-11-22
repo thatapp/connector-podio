@@ -30,6 +30,12 @@ function Podio(cfg, context) {
 var MAX_REFRESH_ATTEMPTS = 2;
 
 Podio.prototype.request = function (method, path, params, formData, headers) {
+    const { withPodioRetries } = require('./helpers/request-retries');
+    return Q(withPodioRetries(this.cfg, String(method).toUpperCase(),
+        () => this.requestOnce(method, path, params, formData, headers)));
+};
+
+Podio.prototype.requestOnce = function (method, path, params, formData, headers) {
     var defered = Q.defer();
     var that = this;
     var refreshAttempts = 0;
@@ -75,9 +81,7 @@ Podio.prototype.request = function (method, path, params, formData, headers) {
             }
         }
         if (err) {
-            // Transport-level error (network, DNS, timeout). Mark retryable so
-            // the iPaaS sailor auto-retries per its 10-retry exponential-backoff
-            // policy. See docs.elastic.io/developers/error-retry.html.
+            // The request policy decides whether another attempt is safe for this method.
             err.retry = true;
             return defered.reject(err);
         }

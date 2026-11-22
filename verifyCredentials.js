@@ -4,7 +4,7 @@ const Podio = require('./podio');
 
 module.exports = async function verifyCredentials(credentials, cb) {
     try {
-        const cfg = { oauth: credentials.oauth };
+        const cfg = { oauth: credentials.oauth, retries: credentials.retries, retryDelay: credentials.retryDelay };
         const podio = new Podio(cfg);
 
         // Verify credentials by making a simple API call to Podio

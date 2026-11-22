@@ -18,6 +18,19 @@
         "label": "Authentication",
         "viewClass": "OAuthFieldView",
         "required": true
+      },
+      "retries": {
+        "label": "Number of retries",
+        "viewClass": "NumberFieldView",
+        "required": false,
+        "default": 5
+      },
+      "retryDelay": {
+        "label": "Delay between retries",
+        "viewClass": "NumberFieldView",
+        "required": false,
+        "default": 10000,
+        "description": "Wait in milliseconds between retryable requests."
       }
     },
     "oauth2": {

@@ -41,6 +41,6 @@ describe('Native HTTP dependency compatibility (no network)', function () {
 
     it('preserves provider error classification after the dependency update', async function () {
         nock('https://api.podio.com').get('/item/123').reply(503, { error: 'temporary_error' });
-        await assert.rejects(client().get('/item/123'), error => error.statusCode === 503 && error.retry === true);
+        await assert.rejects(client().requestOnce('GET', '/item/123'), error => error.statusCode === 503 && error.retry === true);
     });
 });
