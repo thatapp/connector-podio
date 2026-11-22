@@ -6,6 +6,16 @@
       "title": "App Id",
       "required": true,
       "placeholder": "Valid app id"
+    },
+    "tag": {
+      "type": "string",
+      "title": "Tag",
+      "required": true
+    },
+    "space_id": {
+      "type": "number",
+      "title": "Space ID",
+      "required": true
     }
   }
 }

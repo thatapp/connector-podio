@@ -12,6 +12,11 @@
       "title": "Text",
       "required": false,
       "placeholder": "The tag to search for"
+    },
+    "tag": {
+      "type": "string",
+      "title": "Tag",
+      "required": true
     }
   }
 }
