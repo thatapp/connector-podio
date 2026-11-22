@@ -6,6 +6,17 @@
       "required": true,
       "title": "App Id"
     },
+    "view_id": {
+      "type": "number",
+      "title": "Saved View ID",
+      "required": false
+    },
+    "offset": {
+      "type": "number",
+      "title": "Starting Offset",
+      "minimum": 0,
+      "required": false
+    },
     "sort_by": {
       "type": "string",
       "title": "Sort By",

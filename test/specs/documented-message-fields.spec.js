@@ -58,6 +58,19 @@ describe('Documented comment, task, search and membership inputs', function () {
         assert.strictEqual(context.emit.firstCall.args[1].body._searchApp_no_match, true);
     });
 
+    it('pages from the requested offset within the saved view and stops at its count', async function () {
+        const offsets = [];
+        post.callsFake(async (url, body) => {
+            assert.strictEqual(url, '/item/app/11/filter/12/');
+            assert.strictEqual(body.filters, undefined);
+            offsets.push(body.offset);
+            return { total: 30, filtered: 4, items: [{ item_id: body.offset + 21 }] };
+        });
+        await run('getItemsbyApp', { app_id: 11, view_id: 12, offset: '2', limit: 1, filters: { unused: 0 } });
+        assert.deepStrictEqual(offsets, [2, 3]);
+        assert.deepStrictEqual(context.emit.getCalls().map(call => call.args[1].body.item_id), [23, 24]);
+    });
+
     it('accepts documented and legacy workspace member mappings', async function () {
         await run('updateSpaceMembershipV2', { space_id: 11, user_id: 12, role: 'light' });
         await run('updateSpaceMembershipV2', { space_t_id: '11', user_t_id: '12', role_t: 'light' });
