@@ -21,6 +21,7 @@
       },
       "retries": {
         "label": "Number of retries",
+        "description": "Retry up to 10 times within the step time limit.",
         "viewClass": "NumberFieldView",
         "required": false,
         "default": 5

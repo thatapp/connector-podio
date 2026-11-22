@@ -32,7 +32,7 @@ var MAX_REFRESH_ATTEMPTS = 2;
 Podio.prototype.request = function (method, path, params, formData, headers) {
     const { withPodioRetries } = require('./helpers/request-retries');
     return Q(withPodioRetries(this.cfg, String(method).toUpperCase(),
-        () => this.requestOnce(method, path, params, formData, headers)));
+        () => this.requestOnce(method, path, params, formData, headers), undefined, this.context?.podioRetryDeadline));
 };
 
 Podio.prototype.requestOnce = function (method, path, params, formData, headers) {
