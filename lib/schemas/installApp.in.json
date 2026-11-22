@@ -2,12 +2,12 @@
   "type": "object",
   "properties": {
     "space_id": {
-      "type": "string",
+      "type": ["number", "string"],
       "required": true,
       "title": "Space id"
     },
     "app_id": {
-      "type": "string",
+      "type": ["number", "string"],
       "required": true,
       "title": "App id"
     }

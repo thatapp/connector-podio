@@ -45,7 +45,7 @@ describe('Hook validation on every read operation (GitLab #476; no network)', fu
     it('covers the read operations the component declares (control: the list is not empty)', function () {
         assert.ok(operations.filter((o) => o.kind === 'action').length >= 50, 'read actions found: ' + operations.length);
         assert.deepStrictEqual(operations.filter((o) => o.kind === 'trigger').map((o) => o.key).sort(),
-            ['getApplications', 'getItems', 'getOrganisations', 'getSpaces', 'hookVerifyOrGetItem']);
+            ['getApplications', 'getItems', 'getOrganisations', 'getSpaces', 'hookVerifyOrGetItem', 'pollApp', 'pollOrg', 'pollSpace']);
     });
 
     describe('a hook validation message', function () {

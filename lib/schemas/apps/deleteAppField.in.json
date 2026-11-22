@@ -2,12 +2,12 @@
     "type": "object",
     "properties": {
         "app_id": {
-            "type": "string",
+            "type": ["number", "string"],
             "required": true,
             "title": "App id"
         },
         "field_id": {
-            "type": "string",
+            "type": ["number", "string"],
             "required": true,
             "title": "Field id"
         }

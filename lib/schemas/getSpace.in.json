@@ -2,7 +2,7 @@
   "type": "object",
   "properties": {
     "space_id": {
-      "type": "string",
+      "type": ["number", "string"],
       "required": true,
       "title": "Space ID",
       "description": "The unique identifier of the space to retrieve"
