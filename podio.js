@@ -9,13 +9,14 @@ var errors = require('./helpers/errors.js');
 const axios = require('axios');
 var handlebars = require('handlebars');
 
-// In-process lock around OAuth token refresh. When multiple actions race to
-// refresh (typically during a large batch that crosses the 8h token boundary),
-// only ONE refresh proceeds; the rest wait for it and reuse the fresh cfg.
-// Without this, concurrent 401s caused multiple parallel refreshes + a race
-// on the credential-store PATCH, and the losers kept using stale tokens —
-// resulting in records dropping silently mid-batch.
-let podioRefreshLock = null;
+const { createHash } = require('crypto');
+const refreshes = new Map();
+
+function refreshKey(cfg) {
+    // A legacy caller without a stored credential ID can share only its own configuration object.
+    if (!cfg._account || !cfg.oauth?.refresh_token) return cfg;
+    return JSON.stringify([String(cfg._account), createHash('sha256').update(cfg.oauth.refresh_token).digest('hex')]);
+}
 
 function Podio(cfg, context) {
     this.cfg = cfg;
@@ -96,51 +97,28 @@ Podio.prototype.request = function (method, path, params, formData, headers) {
             }
             refreshAttempts++;
 
-            // Concurrent-refresh guard. If another action is already refreshing,
-            // wait for the in-flight refresh to complete; then update OUR cfg
-            // and retry the original request with the fresh access_token.
-            if (podioRefreshLock) {
-                return podioRefreshLock
-                    .then((freshCfg) => {
-                        that.cfg = freshCfg;
-                        requestParams.headers.Authorization = 'OAuth2 ' + freshCfg.oauth.access_token;
-                        request(requestParams, responseHandler);
-                    })
-                    .catch((refreshErr) => {
-                        refreshErr.retry = true;
-                        defered.reject(refreshErr);
+            const key = refreshKey(that.cfg);
+            let refresh = refreshes.get(key);
+            if (!refresh) {
+                // Register the promise before calling the adapter, even when it responds synchronously.
+                refresh = Promise.resolve().then(() => new Promise((resolve, reject) => {
+                    const pending = oauthUtils.refreshAppToken('podio', that.cfg, result => {
+                        if (result instanceof Error) return reject(classifyRefreshError(result));
+                        if (!result?.oauth?.access_token) return reject(new Error('Podio did not return a refreshed access token.'));
+                        resolve(result);
                     });
+                    Promise.resolve(pending).catch(reject);
+                })).then(async cfg => {
+                    await updateToken(cfg);
+                    return cfg.oauth;
+                }).finally(() => refreshes.delete(key));
+                refreshes.set(key, refresh);
             }
-
-            // First 401 of the race — initiate the refresh. The original
-            // `onTokenRefresh` callback handled success but unconditionally
-            // assigned the callback arg to `that.cfg` — including when the
-            // arg was an Error (refresh failure), which then threw TypeError
-            // on `cfg.oauth.access_token`. Properly distinguish here:
-            podioRefreshLock = new Promise((resolveLock, rejectLock) => {
-                oauthUtils.refreshAppToken('podio', that.cfg, function (newCfgOrErr) {
-                    if (newCfgOrErr instanceof Error) {
-                        podioRefreshLock = null;
-                        // A failed refresh is usually a transient blip (network /
-                        // 5xx on the token endpoint) and is safe to retry. But
-                        // invalid_grant / oauth.grant.expired means Podio has
-                        // permanently invalidated the refresh_token — it rotates on
-                        // every use and expires after prolonged inactivity. Retrying
-                        // re-sends the same dead token and burns all 10 backoff
-                        // attempts, surfacing a confusing raw 400 body. Classify it
-                        // as a clear, NON-retryable "reconnect the account" error.
-                        const refreshErr = classifyRefreshError(newCfgOrErr);
-                        rejectLock(refreshErr);
-                        return defered.reject(refreshErr);
-                    }
-                    // Happy path: existing logic assigns cfg, PATCHes the
-                    // credential store, re-runs THIS request via onTokenRefresh.
-                    onTokenRefresh(newCfgOrErr);
-                    // Release lock so concurrent waiters can use the fresh cfg.
-                    podioRefreshLock = null;
-                    resolveLock(newCfgOrErr);
-                });
-            });
+            refresh.then(oauth => {
+                that.cfg = { ...that.cfg, oauth };
+                requestParams.headers.Authorization = 'OAuth2 ' + oauth.access_token;
+                request(requestParams, responseHandler);
+            }).catch(error => defered.reject(error));
             return;
         }
 
@@ -185,14 +163,6 @@ Podio.prototype.request = function (method, path, params, formData, headers) {
         return defered.resolve(body);
     }
 
-    function onTokenRefresh(cfg) {
-        that.cfg = cfg;
-        updateToken(cfg);
-        requestParams.headers.Authorization = 'OAuth2 ' + cfg.oauth.access_token;
-
-        request(requestParams, responseHandler);
-    }
-
     async function updateToken(cfg) {
         console.log('Updating component credentials with new access token');
         var data = {
@@ -212,23 +182,24 @@ Podio.prototype.request = function (method, path, params, formData, headers) {
         var oauth2 = credentials["oauth2"];
 
 
-        var email = getValueFromEnv(oauth2['email']);
-        var avaApi = getValueFromEnv(oauth2['apiKey']);
-
-        const token = Buffer.from(`${email}:${avaApi}`, 'utf8').toString('base64')
-        await axios.patch(`https://api.thatapp.io/v2/credentials/${cfg._account}`, data,
-            {
-                headers: {
-                    'Authorization': `Basic ${token}`
-                },
+        try {
+            if (cfg._account) {
+                const email = getValueFromEnv(oauth2.email);
+                const apiKey = getValueFromEnv(oauth2.apiKey);
+                const authorization = Buffer.from(email + ':' + apiKey, 'utf8').toString('base64');
+                await axios.patch('https://api.thatapp.io/v2/credentials/' + encodeURIComponent(cfg._account), data, {
+                    headers: { Authorization: 'Basic ' + authorization },
+                });
             }
-        ).catch((errr) => {
-            console.log(errr);
-        });
+        } catch (error) {
+            const logger = that.context?.logger || console;
+            logger.warn('Could not update the stored Podio credential over HTTP' +
+                (error.response?.status ? ' (HTTP ' + error.response.status + ')' : '') + '.');
+        }
 
         // Emit updateKeys event per thatapp.io docs to persist refreshed tokens
         if (that.context && that.context.emit) {
-            that.context.emit('updateKeys', { oauth: cfg.oauth });
+            await that.context.emit('updateKeys', { oauth: cfg.oauth });
         }
     }
 
